@@ -1,32 +1,36 @@
+<!--
+ * @Author: hidari
+ * @Date: 2022-05-05 14:40:49
+ * @LastEditors: lijiaying 1640106564@qq.com
+ * @LastEditTime: 2022-05-05 17:39:00
+ * @FilePath: \mobile-news-management\src\App.vue
+ * @Description: 根路由
+ *
+ * Copyright (c) 2022 by hidari, All Rights Reserved.
+-->
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
+    <!-- 根路由出口 -->
     <router-view/>
   </div>
 </template>
 
-<style lang="less">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
+<script>
+export default {
+  name: 'App',
+  components: {},
+  props: {},
+  data () {
+    return {
     }
-  }
+  },
+  computed: {},
+  watch: {
+  },
+  created () {},
+  methods: {}
 }
+</script>
+
+<style scoped>
 </style>
