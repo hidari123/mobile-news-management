@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-05 19:42:02
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-06 13:28:56
+ * @LastEditTime: 2022-05-06 18:29:15
  * @FilePath: \mobile-news-management\src\views\login\index.vue
  * @Description: 登录组件
  *
@@ -12,7 +12,13 @@
   <div>
       <div class="login-container">
         <!-- NavBar 组件：只需提供 title 标题 -->
-        <van-nav-bar title="注册/登录" fixed class="page-nav-bar"/>
+        <van-nav-bar
+        left-text="返回"
+        left-arrow
+        title="注册/登录"
+        @click-left="onClickLeft"
+        fixed
+        class="page-nav-bar"/>
         <!-- 登录的表单 -->
         <!--
             表单验证：
@@ -79,7 +85,7 @@ export default {
       // 用户填写的表单数据
       form: {
         // 手机号
-        mobile: '13888888123',
+        mobile: '13911111111',
         // 登录密码
         code: '246810'
       },
@@ -127,10 +133,10 @@ export default {
         this.$toast.success('登录成功')
         // console.log(res)
       } catch (error) {
-        if (error.response.status === 400) {
-          this.$toast.fail('手机号或验证码错误')
-          return false
-        }
+        // if (error.response.status === 400) {
+        //   this.$toast.fail('手机号或验证码错误')
+        //   return false
+        // }
         this.$toast.fail('登陆失败，请稍后重试')
       }
     },
@@ -157,10 +163,10 @@ export default {
       } catch (error) {
         // 关闭倒计时
         this.isCountDownShow = false
-        let message = '发送失败，请稍后重试'
-        if (error.response.status === 429) {
-          message = '1分钟内只能发送1次，请稍后重试'
-        }
+        const message = '发送失败，请稍后重试'
+        // if (error.response.status === 429) {
+        //   message = '1分钟内只能发送1次，请稍后重试'
+        // }
         this.$toast.fail(message)
       }
     },
@@ -209,6 +215,12 @@ export default {
         return false
       }
       return true
+    },
+    /**
+     * 返回上一页
+     */
+    onClickLeft () {
+      this.$router.back()
     }
   }
 }

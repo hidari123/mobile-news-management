@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-05 14:40:49
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-05 17:39:00
+ * @LastEditTime: 2022-05-06 18:20:09
  * @FilePath: \mobile-news-management\src\App.vue
  * @Description: 根路由
  *

@@ -3,7 +3,7 @@
  * @Author: hidari
  * @Date: 2022-05-06 09:28:28
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-06 12:27:01
+ * @LastEditTime: 2022-05-06 17:34:07
  * @FilePath: \mobile-news-management\src\api\user.api.js
  * @Description: 封装user的 API 接口
  *
@@ -24,3 +24,9 @@ export const reqLogin = data => request.post('/authorizations', data)
  * @returns
  */
 export const reqSendSms = mobile => request.get(`/sms/codes/${mobile}`)
+
+/**
+ * 获取用户个人信息
+ * @returns
+ */
+export const reqGetUserInfo = () => request.get('/user')
