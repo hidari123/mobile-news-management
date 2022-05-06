@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-05 17:13:41
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-05 17:43:12
+ * @LastEditTime: 2022-05-05 20:39:06
  * @FilePath: \mobile-news-management\postcss.config.js
  * @Description: postcss配置文件
  * 使用 postcss-pxtorem 将 px 转为 rem
