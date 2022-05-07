@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-07 15:58:18
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-07 16:22:11
+ * @LastEditTime: 2022-05-07 18:06:14
  * @FilePath: \mobile-news-management\src\utils\dayjs.js
  * @Description: dayjs 插件使用
  *
@@ -19,10 +19,6 @@ dayjs.extend(rTime)
 
 // 配置语音包为全局使用
 dayjs.locale('zh-cn')
-
-// dayjs() 获取当前数据时间
-const nowDate = dayjs().format('YYYY-MM-DD')
-console.log(nowDate)
 
 // 定义一个全局过滤器 可以在任何组件的模板中使用
 // 相当于全局方法 只能供模板使用
