@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-05 14:40:49
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-05 15:58:48
+ * @LastEditTime: 2022-05-07 15:55:15
  * @FilePath: \mobile-news-management\public\index.html
  * @Description: 入口html
  * 
@@ -17,6 +17,8 @@
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <link rel="stylesheet" href="//at.alicdn.com/t/font_1577345_xzaqohcozor.css">
     <title><%= htmlWebpackPlugin.options.title %></title>
+    <!-- 声明所有资源请求 不要使用 referrer 请求头 -->
+    <meta name="referrer" content="no-referrer"/>
   </head>
   <body>
     <noscript>

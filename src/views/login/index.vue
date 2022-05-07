@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-05 19:42:02
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-06 18:29:15
+ * @LastEditTime: 2022-05-07 11:11:50
  * @FilePath: \mobile-news-management\src\views\login\index.vue
  * @Description: 登录组件
  *
@@ -133,10 +133,10 @@ export default {
         this.$toast.success('登录成功')
         // console.log(res)
       } catch (error) {
-        // if (error.response.status === 400) {
-        //   this.$toast.fail('手机号或验证码错误')
-        //   return false
-        // }
+        if (error.response.status === 400) {
+          this.$toast.fail('手机号或验证码错误')
+          return false
+        }
         this.$toast.fail('登陆失败，请稍后重试')
       }
     },
@@ -163,10 +163,10 @@ export default {
       } catch (error) {
         // 关闭倒计时
         this.isCountDownShow = false
-        const message = '发送失败，请稍后重试'
-        // if (error.response.status === 429) {
-        //   message = '1分钟内只能发送1次，请稍后重试'
-        // }
+        let message = '发送失败，请稍后重试'
+        if (error.response.status === 429) {
+          message = '1分钟内只能发送1次，请稍后重试'
+        }
         this.$toast.fail(message)
       }
     },

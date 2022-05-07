@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-05 14:40:49
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-06 15:26:33
+ * @LastEditTime: 2022-05-07 16:18:50
  * @FilePath: \mobile-news-management\src\main.js
  * @Description: 主入口js文件
  *
@@ -20,9 +20,12 @@ import 'vant/lib/index.less'
 import '@/styles/index.less'
 // 加载动态设置 REM 基准值
 import 'amfe-flexible'
+// 加载 dayjs 初始化配置
+import dayjs from '@/utils/dayjs'
 
 Vue.config.productionTip = false
 Vue.use(Vant)
+Vue.use(dayjs)
 
 new Vue({
   router,

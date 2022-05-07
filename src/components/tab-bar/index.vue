@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-06 14:17:39
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-06 16:41:15
+ * @LastEditTime: 2022-05-07 09:17:55
  * @FilePath: \mobile-news-management\src\components\tab-bar\index.vue
  * @Description: 底部导航栏
  *
@@ -20,7 +20,7 @@
       路由模式下会匹配页面路径和标签的to属性，并自动选中对应的标签
      -->
     <van-tabbar class="tabbar" v-model="active" route>
-      <van-tabbar-item icon="home-o" to="/">
+      <van-tabbar-item icon="home-o" to="/home">
         <span>首页</span>
         <van-icon
           slot="icon"

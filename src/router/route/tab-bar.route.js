@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-06 14:19:00
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-06 14:32:04
+ * @LastEditTime: 2022-05-07 09:18:48
  * @FilePath: \mobile-news-management\src\router\route\tab-bar.route.js
  * @Description: 底部标签栏
  *
@@ -11,10 +11,11 @@
 export const tabBar = [
   {
     path: '/',
+    redirect: 'home',
     component: () => import('@/components/tab-bar'),
     children: [
       { // 首页
-        path: '', // 默认子路由
+        path: '/home', // => path: '' => 默认子路由
         name: 'Home',
         component: () => import('@/views/home')
       },

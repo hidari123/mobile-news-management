@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-06 14:13:04
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-06 18:41:44
+ * @LastEditTime: 2022-05-07 09:21:08
  * @FilePath: \mobile-news-management\src\views\my\index.vue
  * @Description: 我的
  *
@@ -18,11 +18,11 @@
           </div>
       </div>
       <!-- 头部-正在加载 -->
-        <div class="header loading" v-if="!userInfo">
+        <div class="header loading" v-if="getLogin && !userInfo">
         <van-skeleton title avatar :row="3" />
       </div>
       <!-- 头部-已登录 -->
-      <div class="header user-info" v-else>
+      <div class="header user-info" v-if="getLogin && userInfo">
           <div class="base-info">
               <div class="user">
                 <van-image
