@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-06 14:27:36
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-07 12:51:42
+ * @LastEditTime: 2022-05-09 13:27:06
  * @FilePath: \mobile-news-management\src\views\home\index.vue
  * @Description 首页
  *
@@ -30,25 +30,46 @@
                 <article-list :channel="channel"/>
             </van-tab>
             <div slot="nav-right" class="placeholder"></div>
-            <div slot="nav-right" class="hamburger">
+            <div
+            slot="nav-right"
+            class="hamburger"
+            @click="isChannelEditShow=true">
                 <i class="toutiao toutiao-gengduo"></i>
             </div>
         </van-tabs>
+        <!-- /频道列表 -->
+
+        <!-- 频道编辑弹出层 -->
+        <van-popup
+            v-model="isChannelEditShow"
+            closeable
+            position="bottom"
+            close-icon-position="top-left"
+            :style="{ height: '100%' }"
+        >
+        <channel-edit :my-channels="channels" :active="active" @update-active="onUpdateActive"/>
+        </van-popup>
+        <!-- /频道编辑弹出层 -->
     </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import ArticleList from './components/article-list.vue'
+import ChannelEdit from './components/channel-edit.vue'
+import { getItem } from '@/utils/storage.js'
+import { channels } from '@/constants'
 export default {
   name: 'Home',
   data () {
     return {
-      active: 0
+      active: 0,
+      isChannelEditShow: false
     }
   },
   components: {
-    ArticleList
+    ArticleList,
+    ChannelEdit
   },
   created () {
     this.loadChannels()
@@ -56,15 +77,33 @@ export default {
   computed: {
     ...mapState('home', {
       channels: state => state.channels
+    }),
+    ...mapGetters({
+      getLogin: 'getLogin'
     })
   },
   methods: {
     loadChannels () {
       try {
-        this.$store.dispatch('home/getLoadChannels')
+        if (this.getLogin) {
+          // 已登录 获取用户频道列表
+          this.$store.dispatch('home/getLoadChannels')
+        } else {
+          // 未登录 判断是否有本地频道列表数据
+          const localChannels = getItem(channels)
+          if (localChannels) {
+            this.$store.commit('home/getLoadChannels', localChannels)
+          } else {
+            this.$store.dispatch('home/getLoadChannels')
+          }
+        }
       } catch (error) {
         this.$toast.fail('获取频道列表失败，请稍后重试')
       }
+    },
+    onUpdateActive (index, isChannelEditShow) {
+      this.active = index
+      this.isChannelEditShow = isChannelEditShow
     }
   }
 }
