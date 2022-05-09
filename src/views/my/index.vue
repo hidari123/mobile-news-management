@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-06 14:13:04
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-07 09:21:08
+ * @LastEditTime: 2022-05-09 17:39:37
  * @FilePath: \mobile-news-management\src\views\my\index.vue
  * @Description: 我的
  *
@@ -79,6 +79,7 @@
             <van-cell
                 style="text-align: center; color: #d86262"
                 title="退出登录"
+                @click="onLogout"
                 clickable
             />
         </van-cell-group>
@@ -109,6 +110,21 @@ export default {
         // 用户登录后请求
         this.$store.dispatch('user/getUserInfo')
       }
+    },
+    onLogout () {
+      // 提示用户确认退出
+      // 确认 -> 处理退出
+      this.$dialog.confirm({
+        title: '退出提示',
+        message: '确认退出吗？'
+      })
+        .then(() => { // 确认执行这里
+          // 清除用户登录状态
+          this.$store.commit('user/setUser', null)
+        })
+        .catch(() => { // 退出执行这里
+          // on cancel
+        })
     }
   }
 }

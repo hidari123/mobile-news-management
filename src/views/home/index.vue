@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-06 14:27:36
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-09 13:27:06
+ * @LastEditTime: 2022-05-09 13:52:22
  * @FilePath: \mobile-news-management\src\views\home\index.vue
  * @Description 首页
  *
@@ -19,6 +19,7 @@
             size="small"
             icon="search"
             @click="$router.push('/search')"
+            to="/search"
         >搜索</van-button>
         </div>
         <!-- /导航栏 -->
