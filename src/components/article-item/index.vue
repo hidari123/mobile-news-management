@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-07 14:25:04
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-10 15:32:19
+ * @LastEditTime: 2022-05-10 16:19:32
  * @FilePath: \mobile-news-management\src\components\article-item\index.vue
  * @Description: 文章列表项组件
  *
@@ -11,7 +11,7 @@
 <template>
 <div class="article-item-container">
     <!-- 文章的信息 -->
-  <van-cell class="article-item">
+  <van-cell class="article-item" :to="`/article/${article.art_id}`">
       <div slot="title" class="title van-multi-ellipsis--l2">{{article.title}}</div>
       <div slot="label">
           <div class="cover-wrap" v-if="article.cover.type === 3">

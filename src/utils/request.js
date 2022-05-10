@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-05 17:46:24
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-07 17:58:37
+ * @LastEditTime: 2022-05-10 16:52:32
  * @FilePath: \mobile-news-management\src\utils\request.js
  * @Description: 请求模块二次封装
  *
@@ -18,22 +18,26 @@ const instance = axios.create({
 //   baseURL: 'http://api-toutiao-web.itheima.net/',
   baseURL: '/v1_0',
   //   baseURL: 'http://www.liulongbin.top:8000/v1_0',
-  timeout: 5000
-})
-
-/**
- * 配置处理后端返回数据中超出 js 安全整数范围问题
- * transformResponse 允许自定义原始的响应数据（字符串）
- */
-instance.defaults.transformResponse = [
-  function (data) {
+  timeout: 5000,
+  /**
+   * 配置处理后端返回数据中超出 js 安全整数范围问题
+   * transformResponse 允许自定义后端返回的原始的响应数据（字符串）
+   */
+  transformResponse: function (data) {
     try {
+      /**
+       * JSONBig => 可以处理数据中超出 js 安全整数范围的问题
+       * JSONBig.parse()
+       * JSONBig.stringify()
+       * JSONBig.parse(JSONBig.strinfify(jsonStr))
+       */
       return jsonBig.parse(data)
     } catch (err) {
-      return {}
+      // 后端返回数据不是标准json字符串
+      return data
     }
   }
-]
+})
 
 /**
  * 请求拦截器
