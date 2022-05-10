@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-07 14:25:04
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-10 11:32:32
+ * @LastEditTime: 2022-05-10 15:32:19
  * @FilePath: \mobile-news-management\src\components\article-item\index.vue
  * @Description: 文章列表项组件
  *
@@ -31,7 +31,7 @@
             <span>{{article.pubdate | relativeTime }}</span>
             <!-- 关闭按钮 -->
             <!-- 通过 .stop 事件修饰符，阻止点击事件的冒泡 -->
-            <van-icon name="cross" @click.stop="show = true" />
+            <van-icon name="cross" @click.stop="show = true" v-if="closable" />
           </div>
       </div>
       <!-- 1图 -->
@@ -73,6 +73,12 @@ export default {
     article: {
       type: Object,
       required: true
+    },
+    // 控制是否展示“叉号”的小图标
+    closable: {
+      type: Boolean,
+      // 默认值为 true，表示展示“叉号”的小图标
+      default: true
     }
   },
   data () {

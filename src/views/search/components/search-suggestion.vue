@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-09 14:05:12
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-09 15:24:34
+ * @LastEditTime: 2022-05-10 15:06:42
  * @FilePath: \mobile-news-management\src\views\search\components\search-suggestion.vue
  * @Description: 联想建议组件
  *
@@ -24,7 +24,7 @@
 <script>
 import { reqGetSearchSuggestions } from '@/api/search.api.js'
 // 防抖
-import { debounce } from 'lodash'
+// import { debounce } from 'lodash'
 export default {
   name: 'SearchSuggestion',
   props: {
@@ -35,7 +35,9 @@ export default {
   },
   data () {
     return {
-      suggestion: []
+      suggestion: [],
+      // 延时器
+      timer: null
     }
   },
   watch: {
@@ -46,12 +48,24 @@ export default {
       // searchText 发生改变的时候调用 handler 函数
       // handler函数写法固定
       // 防抖
-      handler: debounce(function (value) {
-        // 节流会不断的触发,而防抖仅在最后一次触发
-        // 防抖适用于,如搜索输入框提示,仅在输入停止后进行一次提示更新,以减少后台压力。
-        // 节流适用于,如窗体以拖动的方式调整大小,在每次特定的时间片结束后触发一次
-        this.loadSearchSuggestions(value)
-      }, 200),
+    //   handler: debounce(function (value) {
+    //     // 节流会不断的触发,而防抖仅在最后一次触发
+    //     // 防抖适用于,如搜索输入框提示,仅在输入停止后进行一次提示更新,以减少后台压力。
+    //     // 节流适用于,如窗体以拖动的方式调整大小,在每次特定的时间片结束后触发一次
+    //     this.loadSearchSuggestions(value)
+    //   }, 200),
+      // 不要写箭头函数
+      handler (value) {
+        // 清除延时器
+        if (this.timer) clearTimeout(this.timer)
+        // 如果输入的内容为空，则 return 出去，不开启延时器
+        if (this.searchText.trim().length === 0) return
+
+        // 开启延时器
+        this.timer = setTimeout(() => {
+          this.loadSearchSuggestions(value)
+        }, 1000)
+      },
       immediate: true
     }
   },

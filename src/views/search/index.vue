@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-09 13:50:00
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-09 16:54:41
+ * @LastEditTime: 2022-05-10 15:06:27
  * @FilePath: \mobile-news-management\src\views\search\index.vue
  * @Description: 搜索组件
  *
@@ -59,8 +59,13 @@ export default {
       searchHistories: state => state.searchHistories
     })
   },
+  mounted () {
+    const ipt = document.querySelector('input[type=search]')
+    ipt && ipt.focus()
+  },
   methods: {
     onSearch (val) {
+      console.log(val)
       // 更新文本框内容
       this.searchText = val
       // 存储搜索历史纪录
