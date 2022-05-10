@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-09 08:59:21
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-09 13:07:57
+ * @LastEditTime: 2022-05-10 12:23:26
  * @FilePath: \mobile-news-management\src\views\home\components\channel-edit.vue
  * @Description: 频道编辑组件
  *
@@ -28,10 +28,13 @@
         :key="channel.id"
         @click="onMyChannelClick(channel,index)"
         >
-          <van-icon v-show="isEdit && !fixChannels.includes(channel.id)" slot="icon" name="clear"></van-icon>
+          <van-icon v-show="isEdit && !fixChannels.includes(channel.id) && myChannels.length> 2" slot="icon" name="clear"></van-icon>
           <span slot="text" class="text" :class="{active: index === active}">{{channel.name}}</span>
         </van-grid-item>
       </van-grid>
+
+        <!-- 分隔线 -->
+    <div class="van-hairline--top sp-line"></div>
 
       <!-- 频道推荐 -->
       <van-cell :border="false" class="title">
@@ -63,11 +66,20 @@ export default {
     active: {
       type: Number,
       required: true
+    },
+    // 控制编辑状态的显示
+    isEdit: {
+      type: Boolean,
+      required: true
     }
+  },
+  model: {
+    prop: 'isEdit',
+    // 这个事件名可以随意写，它实际上是规定了子组件要更新父组件值需要注册的方法
+    event: 'changeEdit'
   },
   data () {
     return {
-      isEdit: false, // 控制编辑状态的显示
       fixChannels: [0] // 固定频道, 不允许被删除
     }
   },
@@ -104,6 +116,8 @@ export default {
             id: recommendChannel.id, // 频道id
             seq: this.myChannels.length // 序号
           })
+          // 3. 通过 notify 弹框提示用户更新成功
+          this.$notify({ type: 'success', message: '更新成功', duration: 1000 })
         } catch (error) {
           this.$toast.fail('添加频道失败，请稍后重试')
         }
@@ -116,15 +130,15 @@ export default {
      * 点击编辑切换状态
      */
     editCannel () {
-      this.isEdit = !this.isEdit
+      this.$emit('changeEdit', !this.isEdit)
     },
     /**
      * 删除 / 编辑 频道
      */
     onMyChannelClick (channel, index) {
       if (this.isEdit) {
-        // 如果是固定频道 直接返回
-        if (this.fixChannels.includes(channel.id)) return
+        // 如果是固定频道 或 仅剩下两个频道 直接返回
+        if (this.fixChannels.includes(channel.id) || this.myChannels.length === 2) return
         // 编辑 => 删除
         if (this.getLogin) {
           // 已登录
@@ -142,7 +156,7 @@ export default {
         }
       } else {
       // 非编辑 => 切换
-        this.$emit('update-active', index, false)
+        this.$emit('update-active', index, false, this.isEdit)
       }
     }
   }
@@ -209,5 +223,8 @@ export default {
       }
     }
   }
+}
+.sp-line {
+  margin: 10px 0 30px 0;
 }
 </style>

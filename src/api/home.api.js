@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-07 10:47:12
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-09 13:03:46
+ * @LastEditTime: 2022-05-10 09:56:56
  * @FilePath: \mobile-news-management\src\api\home.api.js
  * @Description: 主页相关api
  *
@@ -46,3 +46,23 @@ export const reqAddUserChannels = (channel) => request.patch('/user/channels', {
  * @returns
  */
 export const reqDeleteUserChannels = target => request.delete(`/user/channels/${target}`)
+
+/**
+ * 将文章设置为不感兴趣
+ * @param {*} id 文章的 id
+ * @returns
+ */
+export const reqDislikeArticle = id => request.post('/article/dislikes', {
+  target: id
+})
+
+/**
+ * 举报文章
+ * @param {*} target 举报的文章id
+ * @param {*} type 举报类型： 0-其他问题，1-标题夸张，2-低俗色情，3-错别字多，4-旧闻重复，5-广告软文，6-内容不实，7-涉嫌违法犯罪，8-侵权'
+ * @returns
+ */
+export const reqReportArticle = (target, type) => request.post('/article/reports', {
+  target, // 文章的 Id
+  type // 举报的类型
+})

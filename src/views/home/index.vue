@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-06 14:27:36
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-09 13:52:22
+ * @LastEditTime: 2022-05-10 12:08:33
  * @FilePath: \mobile-news-management\src\views\home\index.vue
  * @Description 首页
  *
@@ -46,9 +46,11 @@
             closeable
             position="bottom"
             close-icon-position="top-left"
+            :close-on-click-overlay="false"
             :style="{ height: '100%' }"
+            @closed="isEdit = false"
         >
-        <channel-edit :my-channels="channels" :active="active" @update-active="onUpdateActive"/>
+        <channel-edit v-model="isEdit" :my-channels="channels" :active="active" @update-active="onUpdateActive"/>
         </van-popup>
         <!-- /频道编辑弹出层 -->
     </div>
@@ -65,7 +67,8 @@ export default {
   data () {
     return {
       active: 0,
-      isChannelEditShow: false
+      isChannelEditShow: false,
+      isEdit: false
     }
   },
   components: {
@@ -84,6 +87,9 @@ export default {
     })
   },
   methods: {
+    /**
+     * 获取频道列表
+     */
     loadChannels () {
       try {
         if (this.getLogin) {
@@ -102,10 +108,17 @@ export default {
         this.$toast.fail('获取频道列表失败，请稍后重试')
       }
     },
+    /**
+     * 子传父自定义事件 @update-active 的回调函数
+     * 更新激活页码
+     */
     onUpdateActive (index, isChannelEditShow) {
       this.active = index
       this.isChannelEditShow = isChannelEditShow
     }
+    // changeEditCallback (isEdit) {
+    //   this.isEdit = isEdit
+    // }
   }
 }
 </script>

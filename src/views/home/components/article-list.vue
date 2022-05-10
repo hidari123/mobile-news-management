@@ -1,6 +1,10 @@
 <template>
   <div class="article-list">
-    <van-pull-refresh v-model="refreshLoading" @refresh="onRefresh">
+    <van-pull-refresh
+    v-model="refreshLoading"
+    @refresh="onRefresh"
+    :success-duration="1500"
+    :disabled="finished">
       <van-list
         v-model="loading"
         :finished="finished"
@@ -11,6 +15,7 @@
           :article="article"
           v-for="(article, index) in list"
           :key="index"
+          @remove-article="removeArticle"
         />
       </van-list>
     </van-pull-refresh>
@@ -75,7 +80,6 @@ export default {
         this.finished = true
       }
     },
-
     async onRefresh () {
       // 1. 请求获取最新数据
       const { data } = await reqGetArtList({
@@ -86,7 +90,7 @@ export default {
       // 2. 把数据放到列表的顶部
       const results = data.results
       let message = ''
-      if (!this.list.indexOf(...results)) {
+      if (results[0].art_id !== this.list[0].art_id) {
         this.list.unshift(...results)
         message = `更新了${results.length}条数据`
       } else {
@@ -98,6 +102,17 @@ export default {
 
       // 4. 提示用户刷新成功
       this.$toast(message)
+    },
+    // 从文章列表中移除指定 id 的文章
+    removeArticle (id) {
+    // 对原数组进行 filter 方法的过滤
+      this.list = this.list.filter(item => item.art_id.toString() !== id)
+
+      // 2. 判断剩余数据的文章数量是否小于 10
+      if (this.list.length < 10) {
+      // 主动请求下一页的数据
+        this.onLoad()
+      }
     }
   }
 }
