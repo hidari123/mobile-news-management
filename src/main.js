@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-05 14:40:49
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-07 16:18:50
+ * @LastEditTime: 2022-05-11 19:07:10
  * @FilePath: \mobile-news-management\src\main.js
  * @Description: 主入口js文件
  *

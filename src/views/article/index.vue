@@ -2,14 +2,14 @@
  * @Author: hidari
  * @Date: 2022-05-10 16:13:29
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-10 21:53:54
+ * @LastEditTime: 2022-05-11 19:25:59
  * @FilePath: \mobile-news-management\src\views\article\index.vue
  * @Description: 文章详情组件
  *
  * Copyright (c) 2022 by hidari, All Rights Reserved.
 -->
 <template>
-  <div class="article-container">
+  <div class="article-container"  ref="article-container">
     <!-- 导航栏 -->
     <van-nav-bar
       class="page-nav-bar"
@@ -71,33 +71,24 @@
         <!-- 文章内容 -->
         <div ref="article-content" class="article-content markdown-body" v-html="article.content" />
         <van-divider>正文结束</van-divider>
+
+        <van-cell ref="comment-area-tip" title="全部评论" :border="false" id="show"/>
+
+        <!-- 文章评论列表 -->
+        <comment-list
+        :source="article.art_id"
+        @click-reply="onReplyShow"
+        :total-count.sync="totalCommentCount"
+        :list="articleComments"
+        />
+        <!-- / 文章评论列表 -->
         <!-- 底部区域 -->
-        <div class="article-bottom">
-        <van-button
-            class="comment-btn"
-            type="default"
-            round
-            size="small"
-        >写评论</van-button>
-        <van-icon
-            name="comment-o"
-            badge="123"
-            color="#777"
-        />
-        <!-- 文章收藏 -->
-        <collect-article
-        class="btn-icon"
-        v-model="article.is_collected"
-        :article-id="article.art_id"
-        />
-        <!-- 文章点赞 -->
-        <like-article
-        class="btn-icon"
-        v-model="article.attitude"
-        :article-id="article.art_id"
-        />
-        <van-icon name="share" color="#777777"></van-icon>
-        </div>
+        <article-footer
+        :article="article"
+        :comment-count="totalCommentCount"
+        @click-write="isPostCommentShow = true"
+        @click-comment="onCommentClick"
+      />
         <!-- /底部区域 -->
       </div>
       <!-- /加载完成-文章详情 -->
@@ -112,6 +103,35 @@
     <!-- 加载失败：错误页面 -->
     <error-page v-else @btn-click="loadArticle" />
     <!-- /加载失败：错误页面 -->
+
+    <!-- 发布文章评论 -->
+    <van-popup
+      v-model="isPostCommentShow"
+      position="bottom"
+      get-container="body"
+    >
+      <post-comment :target="articleId" @post-success="onPostSuccess" />
+    </van-popup>
+    <!-- /发布文章评论 -->
+
+    <!-- 评论回复 -->
+    <!-- 弹出层 => 懒渲染
+        只有第一次展示才会渲染 -->
+    <van-popup
+      v-model="isReplyShow"
+      position="bottom"
+      get-container="body"
+      :style="{ height: '90%' }"
+    >
+      <comment-reply
+        v-if="isReplyShow"
+        :article-id="articleId"
+        :comment="currentReplyComment"
+        @click-close="replyCloseCallback"
+        @total-count="getTotalCount"
+      />
+    </van-popup>
+    <!-- 评论回复 -->
     </div>
   </div>
 </template>
@@ -120,17 +140,27 @@
 import { reqGetArticleDetail } from '@/api/article.api.js'
 import { ImagePreview } from 'vant'
 import FollowUser from '@/components/follow-user'
-import CollectArticle from '@/components/collect-article'
-import LikeArticle from '@/components/like-article'
 import LoadingPage from '@/components/loading-page'
 import ErrorPage from '@/components/error-page'
+import ArticleFooter from './components/article-footer.vue'
+import CommentList from './components/comment-list.vue'
+import PostComment from './components/post-comment.vue'
+import CommentReply from './components/comment-reply'
+// 从 popmotion 中按需导入 animate 动画函数
+// import { animate } from 'popmotion'
 export default {
   name: 'ArticleIndex',
-  components: { FollowUser, CollectArticle, LikeArticle, LoadingPage, ErrorPage },
+  components: { FollowUser, LoadingPage, ErrorPage, CommentList, CommentReply, PostComment, ArticleFooter },
   props: {
     articleId: {
       type: [Number, String, Object],
       required: true
+    }
+  },
+  // 给所有后代组件提供数据
+  provide: function () {
+    return {
+      articleId: this.articleId
     }
   },
   data () {
@@ -142,7 +172,16 @@ export default {
       // 失败状态码
       errStatus: 0,
       // 关注按钮 loading
-      followLoading: false
+      followLoading: false,
+      // 评论总数
+      totalCommentCount: 0,
+      // 控发布评论显示状态
+      isReplyShow: false,
+      // 当前评论的是哪一条
+      currentReplyComment: {},
+      // 评论列表
+      articleComments: [],
+      isPostCommentShow: false
     }
   },
   watch: {},
@@ -150,6 +189,10 @@ export default {
   },
   mounted () {
     this.loadArticle()
+    window.addEventListener('scroll', this.onScroll)
+  },
+  beforeDestroy () {
+    window.removeEventListener('scroll', this.onScroll)
   },
   methods: {
     /**
@@ -198,6 +241,72 @@ export default {
           })
         })
       })
+    },
+
+    /**
+     * 显示评论回复组件
+     */
+    onReplyShow (comment) {
+      this.currentReplyComment = comment
+      console.log(this.currentReplyComment)
+      this.isReplyShow = true
+    },
+
+    /**
+     * 让页面滚动到评论区(未生效)
+     */
+    onCommentClick () {
+      // 让页面滚动到评论区
+      //   const articleContainer = this.$refs['article-container']
+      //   const commentAreaTip = this.$refs['comment-area-tip']
+      //   articleContainer.scrollTop = commentAreaTip.offsetTop - 50
+      // 注意：from 是起始位置，就是滚动条当前的位置
+      // 注意：to 是目标位置，就是 div.article-container 元素的整体高度
+      // 1. 当前滚动条的位置
+      // 子元素调用自身的 scrollIntoView 方法，可以把自己呈现到父容器的可视区域中
+      this.$refs['comment-area-tip'].scrollIntoView({
+        // smooth 表示平滑滚动
+        behavior: 'smooth',
+        // 定义垂直方向的对齐（end 表示"元素的底端"将和其所在滚动区的可视区域的底端对齐）
+        block: 'start'
+      })
+      const now = window.scrollY
+      // 2. 目标位置（文章信息区域的高度）
+      const dist = this.$refs['comment-area-tip'].offsetHeight
+      console.log(now, dist)
+    //   // 3. 实现滚动动画
+    //   animate({
+    //     from: now, // 当前的位置
+    //     to: dist, // 目标位置
+    //     onUpdate: latest => window.scrollTo(0, latest)
+    //   })
+    },
+
+    /**
+     * 发布成功的回调函数
+     */
+    onPostSuccess (commentWrite) {
+      // 关闭弹出层
+      this.isPostCommentShow = false
+      // 将发布内容展示到列表顶部
+      this.articleComments.unshift(commentWrite.new_obj)
+      // 评论总数 + 1
+      this.totalCommentCount = parseInt(this.article.comm_count) + 1
+    },
+
+    replyCloseCallback () {
+      this.isReplyShow = false
+    },
+    /**
+     * 回复发布成功后评论总数 + 1
+     */
+    getTotalCount () {
+      // 评论总数 + 1
+      this.totalCommentCount = parseInt(this.article.comm_count) + 1
+    },
+    onScroll (e) {
+      console.log(this.windowTop)
+      this.windowTop = window.top.scrollY /* or: e.target.documentElement.scrollTop */
     }
   }
 }
@@ -206,6 +315,7 @@ export default {
 <style scoped lang="less">
 @import url('./github-markdown.css');
 .article-container {
+    height:100vh;
   .main-wrap {
     position: fixed;
     left: 0;
@@ -288,35 +398,5 @@ export default {
       color: #666666;
     }
   }
-
-  .article-bottom {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    box-sizing: border-box;
-    height: 88px;
-    border-top: 1px solid #d8d8d8;
-    background-color: #fff;
-    /deep/ .comment-btn {
-      border: 1px solid #eeeeee;
-      font-size: 30px;
-      color: #a7a7a7;
-    //   border: none;
-    }
-    .van-icon {
-      font-size: 40px;
-      .van-info {
-        font-size: 11px;
-        background-color: #e22829;
-      }
-    }
-  }
-}
-.btn-icon {
-    border: none;
 }
 </style>

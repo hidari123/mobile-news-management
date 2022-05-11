@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-05 17:46:24
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-10 16:52:32
+ * @LastEditTime: 2022-05-11 18:24:54
  * @FilePath: \mobile-news-management\src\utils\request.js
  * @Description: 请求模块二次封装
  *
