@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-05 19:42:02
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-07 11:11:50
+ * @LastEditTime: 2022-05-12 18:09:42
  * @FilePath: \mobile-news-management\src\views\login\index.vue
  * @Description: 登录组件
  *
@@ -131,6 +131,10 @@ export default {
         await this.$store.dispatch('user/login', this.form)
         // 当数据请求成功之后，res.data 中存储的就是服务器响应回来的数据
         this.$toast.success('登录成功')
+        // 2. 要跳转到首页
+        const navPath = this.$route.query.pre || '/'
+        console.log(navPath)
+        this.$router.replace(navPath)
         // console.log(res)
       } catch (error) {
         if (error.response.status === 400) {
