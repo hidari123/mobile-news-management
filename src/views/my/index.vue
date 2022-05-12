@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-06 14:13:04
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-12 11:30:25
+ * @LastEditTime: 2022-05-12 15:58:40
  * @FilePath: \mobile-news-management\src\views\my\index.vue
  * @Description: 我的
  *
@@ -69,9 +69,9 @@
             </van-grid-item>
         </van-grid>
 
-        <!-- 小智同学 -->
+        <!-- Hi tari -->
         <van-cell-group :border="false">
-            <van-cell title="小智同学" is-link />
+            <van-cell icon="chat-o" title="Hi tari" is-link to="/chat" />
         </van-cell-group>
 
         <!-- 退出登录 -->

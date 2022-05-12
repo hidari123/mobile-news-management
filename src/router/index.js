@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-05 14:40:49
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-12 11:28:46
+ * @LastEditTime: 2022-05-12 15:53:15
  * @FilePath: \mobile-news-management\src\router\index.js
  * @Description: router 主入口文件
  *
@@ -15,6 +15,7 @@ import { tabBar as TabBar } from './route/tab-bar.route'
 import { search as Search } from './route/search.route'
 import { article as Article } from './route/article.route'
 import { userProfile as UserProfile } from './route/user.route'
+import { chat as Chat } from './route/chat.route'
 
 Vue.use(VueRouter)
 
@@ -23,7 +24,8 @@ const routes = [
   ...TabBar,
   ...Search,
   ...Article,
-  ...UserProfile
+  ...UserProfile,
+  ...Chat
 ]
 
 const router = new VueRouter({

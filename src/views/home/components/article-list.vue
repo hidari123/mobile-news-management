@@ -1,3 +1,13 @@
+<!--
+ * @Author: hidari
+ * @Date: 2022-05-09 08:59:21
+ * @LastEditors: lijiaying 1640106564@qq.com
+ * @LastEditTime: 2022-05-12 16:00:51
+ * @FilePath: \mobile-news-management\src\views\home\components\article-list.vue
+ * @Description: 文章列表组件
+ *
+ * Copyright (c) 2022 by hidari, All Rights Reserved.
+-->
 <template>
   <div class="article-list">
     <van-pull-refresh
