@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-06 14:13:04
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-09 17:39:37
+ * @LastEditTime: 2022-05-12 11:30:25
  * @FilePath: \mobile-news-management\src\views\my\index.vue
  * @Description: 我的
  *
@@ -34,7 +34,7 @@
                 <div class="name">{{userInfo.name}}</div>
               </div>
               <div class="edit">
-                  <van-button size="mini" round>编辑资料</van-button>
+                  <van-button size="mini" round @click="$router.push('/user/profile')">编辑资料</van-button>
               </div>
             </div>
             <div class="data-states">

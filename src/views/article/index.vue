@@ -2,7 +2,7 @@
  * @Author: hidari
  * @Date: 2022-05-10 16:13:29
  * @LastEditors: lijiaying 1640106564@qq.com
- * @LastEditTime: 2022-05-11 19:25:59
+ * @LastEditTime: 2022-05-12 11:14:19
  * @FilePath: \mobile-news-management\src\views\article\index.vue
  * @Description: 文章详情组件
  *
@@ -116,7 +116,8 @@
 
     <!-- 评论回复 -->
     <!-- 弹出层 => 懒渲染
-        只有第一次展示才会渲染 -->
+        只有第一次展示才会渲染
+        要用 v-if -->
     <van-popup
       v-model="isReplyShow"
       position="bottom"
@@ -189,10 +190,6 @@ export default {
   },
   mounted () {
     this.loadArticle()
-    window.addEventListener('scroll', this.onScroll)
-  },
-  beforeDestroy () {
-    window.removeEventListener('scroll', this.onScroll)
   },
   methods: {
     /**
@@ -257,9 +254,15 @@ export default {
      */
     onCommentClick () {
       // 让页面滚动到评论区
-      //   const articleContainer = this.$refs['article-container']
-      //   const commentAreaTip = this.$refs['comment-area-tip']
-      //   articleContainer.scrollTop = commentAreaTip.offsetTop - 50
+    //   const articleContainer = this.$refs['article-container']
+    //   const commentAreaTip = this.$refs['comment-area-tip']
+    //   this.$nextTick(() => {
+    //     setTimeout(() => {
+    //       articleContainer.scrollTop = commentAreaTip.offsetTop - 50
+    //     }, 20)
+    //   })
+
+      //   console.log(articleContainer.scrollTop, commentAreaTip.offsetTop - 50)
       // 注意：from 是起始位置，就是滚动条当前的位置
       // 注意：to 是目标位置，就是 div.article-container 元素的整体高度
       // 1. 当前滚动条的位置
@@ -270,15 +273,19 @@ export default {
         // 定义垂直方向的对齐（end 表示"元素的底端"将和其所在滚动区的可视区域的底端对齐）
         block: 'start'
       })
-      const now = window.scrollY
-      // 2. 目标位置（文章信息区域的高度）
-      const dist = this.$refs['comment-area-tip'].offsetHeight
-      console.log(now, dist)
-    //   // 3. 实现滚动动画
+      // 注意：from 是起始位置，就是滚动条当前的位置
+      // 注意：to 是目标位置，就是 div.article-container 元素的整体高度
+      console.log(window.scrollY, document.querySelector('div.main-wrap').offsetHeight)
     //   animate({
-    //     from: now, // 当前的位置
-    //     to: dist, // 目标位置
-    //     onUpdate: latest => window.scrollTo(0, latest)
+    //     from: window.scrollY,
+    //     to: document.querySelector('div.main-wrap').offsetHeight,
+    //     // 只要值发生了变化，就会触发 onUpdate 函数，通过形参 latest 可以拿到当前最新的值
+    //     onUpdate: function (latest) {
+    //       // 调用 window.scrollTo(x, y) 来让滚动条滚动到目标位置
+    //       // x 是横向滚动的位置
+    //       // y 是纵向滚动的位置
+    //       window.scrollTo(0, latest)
+    //     }
     //   })
     },
 
@@ -303,10 +310,6 @@ export default {
     getTotalCount () {
       // 评论总数 + 1
       this.totalCommentCount = parseInt(this.article.comm_count) + 1
-    },
-    onScroll (e) {
-      console.log(this.windowTop)
-      this.windowTop = window.top.scrollY /* or: e.target.documentElement.scrollTop */
     }
   }
 }
@@ -315,7 +318,6 @@ export default {
 <style scoped lang="less">
 @import url('./github-markdown.css');
 .article-container {
-    height:100vh;
   .main-wrap {
     position: fixed;
     left: 0;

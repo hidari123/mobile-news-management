@@ -1991,3 +1991,639 @@ export default {
         :article-id="article.art_id"
         />
 ```
+
+## 文章评论
+
+### 展示文章评论列表
+
+`src/views/article/components/post-comment.vue`
+
+```vue
+<template>
+  <div class="comment-post">
+    <van-field
+      class="post-field"
+      v-model.trim="message"
+      rows="2"
+      autosize
+      type="textarea"
+      maxlength="50"
+      placeholder="请输入留言"
+      show-word-limit
+    />
+    <van-button
+      class="post-btn"
+      @click="onPost"
+      :disabled="!message.length"
+    >发布</van-button>
+  </div>
+</template>
+
+<script>
+import { reqAddComment } from '@/api/comment.api.js'
+export default {
+  name: 'CommentPost',
+  components: {},
+  props: {
+    target: {
+      type: [Number, String, Object],
+      required: true
+    }
+  },
+  inject: {
+    articleId: {
+      type: [Number, String, Object],
+      default: null
+    }
+  },
+  data () {
+    return {
+      message: ''
+    }
+  },
+  computed: {},
+  watch: {},
+  created () {},
+  mounted () {
+    // 自动聚焦
+    document.querySelector('.post-field .van-cell__value .van-field__body textarea').focus()
+  },
+  methods: {
+    async onPost () {
+      this.$toast.loading({
+        message: '发布中...',
+        // forbidClick 属性可以禁用背景点击
+        forbidClick: true,
+        deration: 0 // 如果为 0 则持续显示，新的toast调用会把旧的清除
+      })
+      try {
+        const res = await reqAddComment({
+          target: this.target,
+          content: this.message,
+          art_id: this.articleId ? this.articleId.toString() : null
+        })
+
+        // 关闭弹出层
+        // 将发布内容展示到列表顶部
+        this.$emit('post-success', res.data)
+        this.$toast.success('发布成功')
+        // 清空文本框
+        this.message = ''
+      } catch (error) {
+        this.$toast.fail('发布失败')
+      }
+    }
+  }
+}
+</script>
+
+<style scoped lang="less">
+.comment-post {
+  display: flex;
+  align-items: center;
+  padding: 32px 0 32px 32px;
+  .post-field {
+    background-color: #f5f7f9;
+  }
+  .post-btn {
+    width: 150px;
+    border: none;
+    padding: 0;
+    color: #6ba3d8;
+    &::before {
+      display: none;
+    }
+  }
+}
+</style>
+```
+
+```vue
+<template>
+  <van-cell class="comment-item">
+    <van-image
+      slot="icon"
+      class="avatar"
+      round
+      fit="cover"
+      :src="comment.aut_photo"
+    />
+    <div slot="title" class="title-wrap">
+      <div class="user-name">{{ comment.aut_name }}</div>
+      <van-button
+        class="like-btn"
+        :icon="comment.is_liking ? 'good-job' : 'good-job-o'"
+        :class="{liked: comment.is_liking}"
+        @click="onCommentLike"
+        :loading="commentLoading"
+      >{{ comment.like_count || '赞' }}</van-button>
+    </div>
+
+    <div slot="label">
+      <p class="comment-content">{{ comment.content }}</p>
+      <div class="bottom-info">
+        <span class="comment-pubdate">{{ comment.pubdate | relativeTime }}</span>
+        <van-button
+          v-if="reply"
+          class="reply-btn"
+          round
+          @click="$emit('click-reply', comment)"
+        >回复 {{ comment.reply_count }}</van-button>
+      </div>
+    </div>
+  </van-cell>
+</template>
+
+<script>
+import { reqAddCommentLike, reqDeleteCommentLike } from '@/api/comment.api.js'
+export default {
+  name: 'CommentItem',
+  components: {},
+  props: {
+    // 数组 可以改值 不能覆盖
+    comment: {
+      type: Object,
+      required: true
+    },
+    // 是否显示“回复”
+    reply: {
+      type: Boolean,
+      default: true
+    }
+  },
+  data () {
+    return {
+      commentLoading: false
+    }
+  },
+  computed: {},
+  watch: {},
+  created () {
+  },
+  mounted () {},
+  methods: {
+    async onCommentLike () {
+      this.commentLoading = true
+      const { comment } = this
+      try {
+        if (comment.is_liking) {
+          // 已经点赞 取消
+          await reqDeleteCommentLike(comment.com_id)
+        } else {
+          // 没有点赞 点赞
+          await reqAddCommentLike(comment.com_id)
+        }
+        // 更新视图状态
+        comment.is_liking = !comment.is_liking
+        comment.like_count += comment.is_liking ? 1 : -1
+        this.$toast.success(comment.is_liking ? '点赞成功' : '取消点赞')
+      } catch (error) {
+        this.$toast.fail('操作失败，请重试')
+      }
+      this.commentLoading = false
+    }
+  }
+}
+</script>
+
+<style scoped lang="less">
+.comment-item {
+  .avatar {
+    width: 72px;
+    height: 72px;
+    margin-right: 25px;
+  }
+  .title-wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .user-name {
+      color: #406599;
+      font-size: 26px;
+    }
+  }
+  .comment-content {
+    font-size: 32px;
+    color: #222222;
+    word-break: break-all;
+    text-align: justify;
+  }
+  .comment-pubdate {
+    font-size: 19px;
+    color: #222;
+    margin-right: 25px;
+  }
+  .bottom-info {
+    display: flex;
+    align-items: center;
+  }
+  .reply-btn {
+    width: 135px;
+    height: 48px;
+    line-height: 48px;
+    font-size: 21px;
+    color: #222;
+  }
+  .like-btn {
+    height: 30px;
+    padding: 0;
+    border: none;
+    font-size: 19px;
+    line-height: 30px;
+    margin-right: 7px;
+    .van-icon {
+      font-size: 30px;
+    }
+    &.liked {
+        color: #e5645f;
+    }
+  }
+}
+</style>
+```
+
+```vue
+<template>
+  <div class="article-comments">
+    <!-- 评论列表 -->
+    <!-- :immediate-check="false" 关闭首次初始位置检查 -->
+    <van-list
+      v-model="loading"
+      :finished="finished"
+      finished-text="没有更多了"
+      :error="error"
+      :immediate-check="false"
+      error-text="加载失败，请点击重试"
+      @load="onLoad"
+    >
+    <comment-item
+    v-for="(item,index) in list"
+    :key="index"
+    :comment="item"
+    @click-reply="$emit('click-reply', $event)"
+    :reply="reply"
+    />
+    </van-list>
+  </div>
+</template>
+
+<script>
+import { reqGetComments } from '@/api/comment.api.js'
+import CommentItem from '@/components/comment-item'
+export default {
+  name: 'CommentList',
+  props: {
+    // 查看文章评论：文章ID
+    // 查看评论回复：评论ID
+    source: {
+      type: [Number, String, Object],
+      required: true
+    },
+    // 评论总数
+    totalCount: {
+      type: Number
+    },
+    // 评论列表
+    list: {
+      type: Array,
+      // 数组或对象默认值要写一个方法 return 出去
+      default: () => []
+    },
+    // a或c评论类型，a-对文章(article)的评论，c-对评论(comment)的回复
+    type: {
+      type: String,
+      // 自定义 prop 数据验证
+      validator (value) {
+        // 传入的值要么是a要么是c 返回布尔值
+        return ['a', 'c'].includes(value)
+      },
+      default: 'a'
+    },
+    reply: {
+      type: Boolean,
+      default: true
+    }
+  },
+  components: { CommentItem },
+  data () {
+    return {
+      loading: false, // 上拉加载更多的 loading
+      finished: false, // 是否加载结束
+      offset: null,
+      limit: 10,
+      error: false
+    }
+  },
+  created () {
+    // 手动开启 初始 loading
+    this.loading = true
+    // 开始就调用一次，拿到评论总数
+    this.onLoad()
+  },
+  methods: {
+    async onLoad () {
+      // 请求数据
+      try {
+        const { data } = await reqGetComments({
+          type: this.type, // a或c评论类型，a-对文章(article)的评论，c-对评论(comment)的回复
+          source: this.source.toString(), // 传参时候 toString axios 不会自动拼接''
+          offset: this.offset,
+          limit: this.limit
+        })
+        const { results, total_count: totalCount } = data
+        // 数据添加到列表中
+        this.list.push(...results)
+        // 文章评论内容双向绑定父组件
+        // console.log(this.list)
+        // this.$emit('update:list', this.list)
+        // 文章评论数传递给父组件
+        console.log(totalCount)
+        this.$emit('update:total-count', totalCount)
+        // loading 设为 false
+        this.loading = false
+        // 判断是否还有数据
+        if (data.last_id !== null) {
+          this.offset = data.last_id
+        } else {
+          this.finished = true
+        }
+      } catch (error) {
+        this.error = true
+        this.loading = false
+      }
+    }
+  }
+}
+</script>
+
+<style scoped lang="less">
+  .publish-wrap {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+  }
+
+  .van-list {
+    margin-bottom: 45px;
+  }
+</style>
+```
+
+```vue
+<template>
+  <div class="comment-reply">
+    <!-- 评论回复 -->
+    <van-nav-bar class="nav-bar" :title="comments.length > 0 ? `${comments.length}条回复` : '暂无回复'">
+      <van-icon slot="left" name="cross" @click="$emit('click-close')" />
+    </van-nav-bar>
+
+    <comment-item :comment="comment" :reply="false" />
+
+    <van-cell :title="comment.reply_count > 0 ? '全部评论' : '快来发布第一条评论吧~'" :border="false" />
+
+    <!-- 回复列表 -->
+    <comment-list
+      :source="comment.com_id"
+      is-comment
+      type="c"
+      :list="comments"
+      :total-count.sync="comment.reply_count"
+      @click-reply="onClickReply"
+      :reply="false"
+    />
+    <!-- /回复列表 -->
+
+    <div class="footer">
+      <van-button
+        class="write-btn"
+        type="default"
+        round
+        size="small"
+        @click="onWriteClick"
+      >写评论</van-button>
+    </div>
+    <!-- /评论回复 -->
+
+    <!-- 发布评论回复 -->
+    <van-popup
+      class="post-comment-popup"
+      v-model="isPostShow"
+      position="bottom"
+    >
+        <post-comment
+        :target="target"
+        :article-id="articleId"
+        @post-success="onPostSuccess"
+        :reply-to="replyTo"
+      />
+    </van-popup>
+    <!-- /发布评论回复 -->
+  </div>
+</template>
+
+<script>
+import CommentItem from '@/components/comment-item'
+import CommentList from './comment-list'
+import PostComment from './post-comment'
+export default {
+  name: 'CommentReply',
+  components: {
+    CommentItem,
+    CommentList,
+    PostComment
+  },
+  inject: {
+    articleId: {
+      type: [Number, String, Object],
+      required: true
+    }
+  },
+  props: {
+    comment: {
+      type: Object,
+      required: true
+    }
+  },
+  data () {
+    return {
+      comments: [],
+      isPostShow: false,
+      target: this.comment.com_id,
+      replyTo: null
+    }
+  },
+  computed: {},
+  watch: {},
+  created () {},
+  methods: {
+    onPostSuccess (comment) {
+      // 将新添加的评论展示到顶部
+      this.comments.unshift(comment.new_obj)
+      // 更新当前评论中的总数量
+      this.comment.reply_count++
+
+      this.$emit('total-count')
+
+      // 关闭发布弹窗
+      this.isPostShow = false
+    },
+
+    onClickReply (comment) {
+      this.target = comment.com_id
+      this.replyTo = comment
+      console.log(this.replyTo)
+      this.isPostShow = true
+    },
+
+    onWriteClick () {
+      this.target = this.comment.com_id
+      this.replyTo = null
+      this.isPostShow = true
+    }
+  }
+}
+</script>
+
+<style scoped lang="less">
+.nav-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 10%;
+}
+
+.footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 88px;
+  border-top: 1px solid #d8d8d8;
+  background-color: #fff;
+  .write-btn {
+    width: 60%;
+  }
+  .van-icon {
+    font-size: 20px;
+  }
+  .comment-icon {
+    bottom: -2px;
+  }
+  .share-icon {
+    bottom: -2px;
+  }
+}
+</style>
+```
+
+`article/index.vue`
+```html
+    <!-- 发布文章评论 -->
+    <van-popup
+      v-model="isPostCommentShow"
+      position="bottom"
+      get-container="body"
+    >
+      <post-comment :target="articleId" @post-success="onPostSuccess" />
+    </van-popup>
+    <!-- /发布文章评论 -->
+
+    <!-- 评论回复 -->
+    <!-- 弹出层 => 懒渲染
+        只有第一次展示才会渲染
+        要用 v-if -->
+    <van-popup
+      v-model="isReplyShow"
+      position="bottom"
+      get-container="body"
+      :style="{ height: '90%' }"
+    >
+      <comment-reply
+        v-if="isReplyShow"
+        :article-id="articleId"
+        :comment="currentReplyComment"
+        @click-close="replyCloseCallback"
+        @total-count="getTotalCount"
+      />
+    </van-popup>
+    <!-- 评论回复 -->
+```
+```js
+
+    /**
+     * 显示评论回复组件
+     */
+    onReplyShow (comment) {
+      this.currentReplyComment = comment
+      console.log(this.currentReplyComment)
+      this.isReplyShow = true
+    },
+
+    /**
+     * 让页面滚动到评论区(未生效)
+     */
+    onCommentClick () {
+      // 让页面滚动到评论区
+    //   const articleContainer = this.$refs['article-container']
+    //   const commentAreaTip = this.$refs['comment-area-tip']
+    //   this.$nextTick(() => {
+    //     setTimeout(() => {
+    //       articleContainer.scrollTop = commentAreaTip.offsetTop - 50
+    //     }, 20)
+    //   })
+
+      //   console.log(articleContainer.scrollTop, commentAreaTip.offsetTop - 50)
+      // 注意：from 是起始位置，就是滚动条当前的位置
+      // 注意：to 是目标位置，就是 div.article-container 元素的整体高度
+      // 1. 当前滚动条的位置
+      // 子元素调用自身的 scrollIntoView 方法，可以把自己呈现到父容器的可视区域中
+      this.$refs['comment-area-tip'].scrollIntoView({
+        // smooth 表示平滑滚动
+        behavior: 'smooth',
+        // 定义垂直方向的对齐（end 表示"元素的底端"将和其所在滚动区的可视区域的底端对齐）
+        block: 'start'
+      })
+      // 注意：from 是起始位置，就是滚动条当前的位置
+      // 注意：to 是目标位置，就是 div.article-container 元素的整体高度
+      console.log(window.scrollY, document.querySelector('div.main-wrap').offsetHeight)
+    //   animate({
+    //     from: window.scrollY,
+    //     to: document.querySelector('div.main-wrap').offsetHeight,
+    //     // 只要值发生了变化，就会触发 onUpdate 函数，通过形参 latest 可以拿到当前最新的值
+    //     onUpdate: function (latest) {
+    //       // 调用 window.scrollTo(x, y) 来让滚动条滚动到目标位置
+    //       // x 是横向滚动的位置
+    //       // y 是纵向滚动的位置
+    //       window.scrollTo(0, latest)
+    //     }
+    //   })
+    },
+
+    /**
+     * 发布成功的回调函数
+     */
+    onPostSuccess (commentWrite) {
+      // 关闭弹出层
+      this.isPostCommentShow = false
+      // 将发布内容展示到列表顶部
+      this.articleComments.unshift(commentWrite.new_obj)
+      // 评论总数 + 1
+      this.totalCommentCount = parseInt(this.article.comm_count) + 1
+    },
+
+    replyCloseCallback () {
+      this.isReplyShow = false
+    },
+    /**
+     * 回复发布成功后评论总数 + 1
+     */
+    getTotalCount () {
+      // 评论总数 + 1
+      this.totalCommentCount = parseInt(this.article.comm_count) + 1
+    }
+```
